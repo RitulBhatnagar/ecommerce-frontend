@@ -44,7 +44,6 @@ export default function Home() {
         quantity: 1,
       },
       {
-        withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
         },
