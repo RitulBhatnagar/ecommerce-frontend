@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Cookies from "js-cookie";
 import { useAuth } from "@/context/AuthContext";
 import ProductList from "./components/ProductList";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
@@ -50,7 +51,8 @@ export default function Home() {
       }
     );
 
-    setMessage(response.data.message);
+    setMessage(`${response.data.message} to the cart`);
+    toast.success(message);
   };
   console.log(message);
 

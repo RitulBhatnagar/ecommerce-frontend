@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -18,30 +19,35 @@ export default function Cart() {
   const [address, setAddress] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    async function fetchCartItems() {
-      try {
-        const token = Cookies.get("accessToken");
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCartItems(response.data.cart.items);
-      } catch (error) {
-        console.error("Error fetching cart items:", error);
-        setError("Failed to load cart. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchCartItems();
   }, []);
+
+  async function fetchCartItems() {
+    try {
+      const token = Cookies.get("accessToken");
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cart`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data.cart === null) {
+        setCartItems([]);
+        return;
+      }
+      setCartItems(response.data.cart.items);
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+      setError("Failed to load cart. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const handleCheckout = async () => {
     try {
@@ -55,12 +61,14 @@ export default function Cart() {
       );
 
       setMessage(response.data.order.message);
+      setIsCheckoutOpen(false);
+      // Refresh the page after successful checkout
+      window.location.reload();
     } catch (error) {
       console.log(error);
+      setError("Checkout failed. Please try again.");
     }
-    setIsCheckoutOpen(false);
   };
-  console.log("message after checkout", message);
 
   // Calculate total price for each product and the overall total price
   const productTotalPrices = cartItems.map(
@@ -84,8 +92,10 @@ export default function Cart() {
       <Navbar />
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8 text-center">Your Cart</h1>
-        {cartItems.length === null ? (
-          <p>Your cart is empty.</p>
+        {cartItems.length === 0 ? (
+          <p className="text-center text-xl">
+            Your cart is empty. Please add products to your cart.
+          </p>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -170,6 +180,11 @@ export default function Cart() {
               </Dialog>
             </div>
           </>
+        )}
+        {message && (
+          <div className="mt-4 p-4 bg-green-100 text-green-700 rounded">
+            {message}
+          </div>
         )}
       </main>
     </div>
