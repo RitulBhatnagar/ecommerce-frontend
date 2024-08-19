@@ -4,6 +4,7 @@ import React, { createContext, useContext, useReducer, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { toast } from "react-hot-toast";
 type AuthState = {
   isAuthenticated: boolean;
   user: null | { id: string; name: string; email: string };
@@ -110,6 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         type: "LOGIN_SUCCESS",
         payload: { user: response.data.user },
       });
+      toast.success(response.data.message);
       router.push("/");
     } catch (error) {
       console.error("Login failed:", error);
@@ -161,6 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           password,
         }
       );
+      toast.success("Registration successful!");
       router.push("/login");
     } catch (error) {
       console.error("Registration failed:", error);
