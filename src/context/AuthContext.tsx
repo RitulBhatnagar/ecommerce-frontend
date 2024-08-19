@@ -99,8 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/login`,
-        { email, password, role },
-        { withCredentials: true }
+        { email, password, role }
       );
       const { accessToken } = response.data;
       console.log("Login response:", response.data);
