@@ -72,7 +72,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user`,
           {
-            withCredentials: true,
             headers: {
               Authorization: `Bearer ${token}`,
             },
