@@ -2,9 +2,15 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-hot-toast";
+import { AxiosErrorResponse } from "@/app/types";
+const isAxiosError = (
+  error: unknown
+): error is AxiosError<AxiosErrorResponse> => {
+  return axios.isAxiosError(error);
+};
 type AuthState = {
   isAuthenticated: boolean;
   user: null | { id: string; name: string; email: string };
@@ -112,7 +118,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       toast.success(response.data.message);
       router.push("/");
     } catch (error) {
-      console.error("Login failed:", error);
+      if (isAxiosError(error)) {
+        const errorMessage = (error.response?.data as AxiosErrorResponse)
+          ?.message;
+        console.error("Login failed:", errorMessage);
+        toast.error(errorMessage);
+      } else {
+        console.error("An unexpected error occurred:", error);
+        toast.error("An unexpected error occurred. Please try again.");
+      }
       dispatch({ type: "SET_LOADING", payload: false });
       throw error;
     }
@@ -164,7 +178,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       toast.success("Registration successful!");
       router.push("/login");
     } catch (error) {
-      console.error("Registration failed:", error);
+      if (isAxiosError(error)) {
+        const errorMessage = (error.response?.data as AxiosErrorResponse)
+          ?.message;
+        console.error("Login failed:", errorMessage);
+        toast.error(errorMessage);
+      } else {
+        console.error("An unexpected error occurred:", error);
+        toast.error("An unexpected error occurred. Please try again.");
+      }
       dispatch({ type: "SET_LOADING", payload: false });
       throw error;
     }

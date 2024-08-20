@@ -8,13 +8,15 @@ import Cookies from "js-cookie";
 import { useAuth } from "@/context/AuthContext";
 import ProductList from "./components/ProductList";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("Item added to cart successfully");
   const [isLoading, setIsLoading] = useState(true);
   const { state } = useAuth();
+  const router = useRouter();
   useEffect(() => {
     async function fetchProducts() {
       try {
@@ -35,7 +37,9 @@ export default function Home() {
 
   const addToCart = async (product: Product) => {
     if (!state.isAuthenticated) {
-      throw new Error("Not authenticated");
+      toast.error("Please login");
+      router.push("/login");
+      return;
     }
     const token = Cookies.get("accessToken");
     const response = await axios.post(
@@ -54,7 +58,6 @@ export default function Home() {
     setMessage(`${response.data.message} to the cart`);
     toast.success(message);
   };
-  console.log(message);
 
   return (
     <div className="min-h-screen bg-gray-100">

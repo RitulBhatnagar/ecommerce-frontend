@@ -20,3 +20,7 @@ export interface CartItem {
   quantity: number;
   product: Product;
 }
+export interface AxiosErrorResponse {
+  message: string;
+  // Add any other fields that you expect in the error response
+}

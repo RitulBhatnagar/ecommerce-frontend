@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -59,7 +60,9 @@ export default function Cart() {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
+      toast.success(
+        "Order placed successfully An email is sent to your email address, Please check"
+      );
       setMessage(response.data.order.message);
       setIsCheckoutOpen(false);
       // Refresh the page after successful checkout
